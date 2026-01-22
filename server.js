@@ -32,3 +32,60 @@ app.get('/allanimals', async (req, res) => {
         res.status(500).json({message: 'Server error for allanimals!'});
     }
 });
+
+app.post('/addanimal', async (req, res) => {
+    const { animal_name, animal_char, animal_desc, animal_habitat, animal_diet, animal_agg, animal_pic } = req.body;
+    try {
+        let connection = await mysql.createConnection(dbConfig);
+        await connection.execute('INSERT INTO animal (animal_name, animal_char, animal_desc, animal_habitat, animal_diet, animal_agg, animal_pic) VALUES (?, ?, ?, ?, ?, ?, ?)', [animal_name, animal_char, animal_desc, animal_habitat, animal_diet, animal_agg, animal_pic]);
+        res.status(201).json({message: 'Animal '+animal_name+' added successfully.'});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({message: 'Server error - could not add card '+animal_name});
+    }
+});
+
+app.put('/updateanimal/:id', async (req, res) => {
+    const { id } = req.params;
+    const { animal_name, animal_char, animal_desc, animal_habitat, animal_diet, animal_agg, animal_pic } = req.body;
+
+    try {
+        let connection = await mysql.createConnection(dbConfig);
+
+        const [result] = await connection.execute(
+            `UPDATE defaultdb.animal SET animal_name = ?, animal_char = ?, animal_desc = ?, animal_habitat = ?, animal_diet = ?, animal_agg =  ?, animal_pic = ? WHERE id = ?`,
+            [animal_name, animal_char, animal_desc, animal_habitat, animal_diet, animal_agg, animal_pic, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: `No animal found with id ${id}` });
+        }
+
+        res.json({ message: `Animal with id ${id} updated successfully.` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Update failed' });
+    }
+});
+
+app.delete('/deleteanime/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        let connection = await mysql.createConnection(dbConfig);
+
+        const [result] = await connection.execute(
+            'DELETE FROM defaultdb.animal WHERE id = ?',
+            [id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: `No animal found with id ${id}` });
+        }
+
+        res.json({ message: `Animal with id ${id} deleted successfully.` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Delete failed' });
+    }
+});

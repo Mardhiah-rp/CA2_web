@@ -41,7 +41,7 @@ app.post('/addanimal', async (req, res) => {
         res.status(201).json({message: 'Animal '+animal_name+' added successfully.'});
     } catch (err) {
         console.error(err);
-        res.status(500).json({message: 'Server error - could not add card '+animal_name});
+        res.status(500).json({message: 'Server error - could not add animal '+animal_name});
     }
 });
 
@@ -68,7 +68,7 @@ app.put('/updateanimal/:id', async (req, res) => {
     }
 });
 
-app.delete('/deleteanime/:id', async (req, res) => {
+app.delete('/deleteanimal/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
